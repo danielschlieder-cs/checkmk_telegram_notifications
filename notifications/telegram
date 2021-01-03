@@ -128,20 +128,10 @@ def send_telegram_message(token, chat_id, text):
         sys.exit(2)
 
 
-def context_require(context, name, error_message):
-    value = context.get(name)
-    if not value:  # e.g. empty field in user database
-        sys.stdout.write("Failed to send Telegram message. {}\n".format(error_message))
-        sys.exit(2)
-    return value
-
-
 def main():
     context = fetch_notification_context()
-    token = context_require(context, "PARAMETER_1", "missing bot token parameter")
-    chat_id = context_require(
-        context, "CONTACT_TELEGRAM_CHAT_ID", "chat id missing for contact"
-    )
+    token = context["PARAMETER_BOT_TOKEN"]
+    chat_id = context["PARAMETER_CHAT_ID"]
     text = construct_message_text(context)
     send_telegram_message(token, chat_id, text)
 
