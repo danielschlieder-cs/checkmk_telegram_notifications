@@ -17,14 +17,14 @@ import sys
 import requests
 
 
-tmpl_host_text = """*Check_MK: $HOSTNAME$ - $EVENT_TXT$*
+tmpl_host_text = """$HOSTSTATE_EMOJI$ `$HOSTNAME$`
 ```
 Host:     $HOSTNAME$
 Event:    $EVENT_TXT$
 Output:   $HOSTOUTPUT$
 ```"""
 
-tmpl_service_text = """*Check_MK: $HOSTNAME$/$SERVICEDESC$ $EVENT_TXT$*
+tmpl_service_text = """$SERVICESTATE_EMOJI$ `$HOSTNAME$/$SERVICEDESC$`
 ```
 Host:     $HOSTNAME$
 Service:  $SERVICEDESC$
@@ -43,7 +43,34 @@ def substitute_context(template, context):
     return template
 
 
+def hoststate_as_emoji(hoststate):
+    if hoststate == "UP":
+        return "\ud83d\udd35"  # large blue circle
+    elif hoststate == "DOWN":
+        return "\ud83d\udd34"  # large red circle
+    elif hoststate == "UNREACH":
+        return "\u26aa\ufe0f"  # medium white circle
+    return hoststate
+
+
+def servicestate_as_emoji(servicestate):
+    if servicestate == "OK":
+        return "\ud83c\udd97"  # squared ok
+    elif servicestate == "WARN":
+        return "\u26a0\ufe0f"  # warning sign
+    elif servicestate == "CRIT":
+        return "\u2757\ufe0f"  # heavy exclamation mark symbol
+    elif servicestate == "UNKN":
+        return "\u2754"  # white question mark ornament
+    return servicestate
+
+
 def construct_message_text(context):
+    context["HOSTSTATE_EMOJI"] = hoststate_as_emoji(context.get("HOSTSHORTSTATE", ""))
+    context["SERVICESTATE_EMOJI"] = servicestate_as_emoji(
+        context.get("SERVICESHORTSTATE", "")
+    )
+
     notification_type = context["NOTIFICATIONTYPE"]
     if notification_type in ["PROBLEM", "RECOVERY"]:
         txt_info = "$PREVIOUS@HARDSHORTSTATE$ -> $@SHORTSTATE$"
