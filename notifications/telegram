@@ -11,10 +11,9 @@
 
 from __future__ import unicode_literals
 
-import os
-import re
 import sys
 import requests
+from cmk.notification_plugins import utils
 
 
 tmpl_host_text = """$HOSTSTATE_EMOJI$ `$HOSTNAME$`
@@ -31,16 +30,6 @@ Service:  $SERVICEDESC$
 Event:    $EVENT_TXT$
 Output:   $SERVICEOUTPUT$
 ```"""
-
-
-def substitute_context(template, context):
-    # First replace all known variables
-    for varname, value in context.items():
-        template = template.replace("$" + varname + "$", value)
-
-    # Remove the rest of the variables and make them empty
-    template = re.sub("\\$[A-Z_][A-Z_0-9]*\\$", "", template)
-    return template
 
 
 def hoststate_as_emoji(hoststate):
@@ -89,24 +78,16 @@ def construct_message_text(context):
     else:
         txt_info = notification_type  # Should never happen
 
-    txt_info = substitute_context(txt_info.replace("@", context["WHAT"]), context)
-
-    context["EVENT_TXT"] = txt_info
+    context["EVENT_TXT"] = utils.substitute_context(
+        txt_info.replace("@", context["WHAT"]), context
+    )
 
     if context["WHAT"] == "HOST":
         tmpl_text = tmpl_host_text
     else:
         tmpl_text = tmpl_service_text
 
-    return substitute_context(tmpl_text, context)
-
-
-def fetch_notification_context():
-    context = {}
-    for (var, value) in os.environ.items():
-        if var.startswith("NOTIFY_"):
-            context[var[7:]] = value.decode("utf-8")
-    return context
+    return utils.substitute_context(tmpl_text, context)
 
 
 def send_telegram_message(token, chat_id, text):
@@ -129,7 +110,7 @@ def send_telegram_message(token, chat_id, text):
 
 
 def main():
-    context = fetch_notification_context()
+    context = utils.collect_context()
     token = context["PARAMETER_BOT_TOKEN"]
     chat_id = context["PARAMETER_CHAT_ID"]
     text = construct_message_text(context)
