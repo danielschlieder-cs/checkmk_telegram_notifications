@@ -65,10 +65,7 @@ def construct_message_text(context):
     else:
         txt_info = notification_type  # Should never happen
 
-    txt_info = substitute_context(
-        txt_info.replace("@", context["WHAT"]),
-        context
-    )
+    txt_info = substitute_context(txt_info.replace("@", context["WHAT"]), context)
 
     context["EVENT_TXT"] = txt_info
 
@@ -113,18 +110,14 @@ def send_telegram_message(token, chat_id, text):
 def context_require(context, name, error_message):
     value = context.get(name)
     if not value:  # e.g. empty field in user database
-        sys.stdout.write(
-            "Failed to send Telegram message. {}\n".format(error_message)
-        )
+        sys.stdout.write("Failed to send Telegram message. {}\n".format(error_message))
         sys.exit(2)
     return value
 
 
 def main():
     context = fetch_notification_context()
-    token = context_require(
-        context, "PARAMETER_1", "missing bot token parameter"
-    )
+    token = context_require(context, "PARAMETER_1", "missing bot token parameter")
     chat_id = context_require(
         context, "CONTACT_TELEGRAM_CHAT_ID", "chat id missing for contact"
     )
