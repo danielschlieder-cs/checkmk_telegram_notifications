@@ -12,17 +12,27 @@ The initial version of this plugin was posted in 2016 on my blog:
 [Monitoring Notifications via Telegram](https://www.srcbox.net/posts/monitoring-notifications-via-telegram/)
 
 
+## Download
+
+The latest version can always be found under
+[Releases](https://git.srcbox.net/stefan/checkmk_telegram_notifications/releases).
+
+The plugin will also be available at
+[Checkmk Exchange](https://exchange.checkmk.com/p/telegram-notifications).
+
+
 ## Setup
 
-Sending messages requires two pieces of information:
+Sending messages via a Telegram bot requires two pieces of information:
 1. The `token`  of a Telegram Bot to send messages with
 2. The `chat id` for any user to send notifications to
 
-## Bot Setup
+
+## Telegram Bot
 
 The instructions for talking to
 [BotFather](https://core.telegram.org/bots#6-botfather) (the Telegram bot used
-to create a new bot) should be straightfoward to follow. The resulting `token`
+to create a new bot) should be straightforward to follow. The resulting `token`
 will be needed for all following steps.
 
 To send messages to a Telegram user, one needs to know the internal `chat id`
@@ -34,7 +44,7 @@ at least one message. Afterwards query the list of incoming messages via the
 `https://api.telegram.org/botTOKEN/getUpdates` (replacing `TOKEN` with the
 actual bot token).
 
-For example using `curl` and `jq` (opening the URL in a web browser might work
+For example using `curl` and `jq` (opening the URL in a web browser will work
 as well):
 ```bash
 curl --silent "https://api.telegram.org/bot${TOKEN}/getUpdates" | jq '.result[].message.chat'
@@ -52,7 +62,10 @@ Output:
 In the above example the `chat id` would be `144553322`.
 
 
+## Notification
+
+
 With both the bot `token` as well as the `chat id` being known one can now
-create a notification rule in Checkmk:
+create a notification rule in Checkmk.
 
 ![Checkmk Notification Rule](images/notification_rule.png)
