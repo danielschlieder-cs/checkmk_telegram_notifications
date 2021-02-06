@@ -17,8 +17,9 @@ The initial version of this plugin was posted in 2016 on my blog:
 The latest version can always be found under
 [Releases](https://git.srcbox.net/stefan/checkmk_telegram_notifications/releases).
 
-The plugin will also be available at
-[Checkmk Exchange](https://exchange.checkmk.com/p/telegram-notifications).
+The plugin is also available at
+[Checkmk Exchange](https://exchange.checkmk.com/p/telegram-notifications) but
+it may take some time to see new releases.
 
 
 ## Setup
