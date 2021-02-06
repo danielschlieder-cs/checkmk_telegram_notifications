@@ -106,7 +106,12 @@ def send_telegram_message(token, chat_id, text):
                 r.status_code, r.text
             )
         )
-        sys.exit(2)
+        return 2
+
+    sys.stdout.write(
+        "Sent message to Telegram chat {}\n".format(chat_id)
+    )
+    return 0
 
 
 def main():
@@ -114,8 +119,8 @@ def main():
     token = context["PARAMETER_BOT_TOKEN"]
     chat_id = context["PARAMETER_CHAT_ID"]
     text = construct_message_text(context)
-    send_telegram_message(token, chat_id, text)
+    return send_telegram_message(token, chat_id, text)
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
