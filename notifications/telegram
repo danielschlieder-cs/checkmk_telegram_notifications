@@ -106,7 +106,7 @@ def send_telegram_message(token, chat_id, text):
                 r.status_code, r.text
             )
         )
-        return 2
+        return 1  # Temporary error to make Checkmk retry
 
     sys.stdout.write(
         "Sent message to Telegram chat {}\n".format(chat_id)
