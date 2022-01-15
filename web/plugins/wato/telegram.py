@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # SPDX-FileCopyrightText: 2021 Stefan Gehn <stefan+cmk@srcbox.net>
