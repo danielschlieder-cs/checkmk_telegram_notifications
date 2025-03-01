@@ -10,25 +10,33 @@
 # Telegram notification based on asciimail notification from check_mk 1.2.6p16.
 
 from __future__ import unicode_literals
-
+from os import environ
 import sys
 import requests
 from cmk.notification_plugins import utils
 
 
 tmpl_host_text = """$HOSTSTATE_EMOJI$ `$HOSTNAME$`
+Send by:  `$OMD_SITE$`
+[Link]($LINK$)
+[inline URL](http://www.example.com/)
 ```
 Host:     $HOSTNAME$
 Event:    $EVENT_TXT$
 Output:   $HOSTOUTPUT$
+
 ```"""
 
 tmpl_service_text = """$SERVICESTATE_EMOJI$ `$HOSTNAME$/$SERVICEDESC$`
+Send by:  `$OMD_SITE$`
+[Link]($LINK$)
+[inline URL](http://www.example.com/)
 ```
 Host:     $HOSTNAME$
 Service:  $SERVICEDESC$
 Event:    $EVENT_TXT$
 Output:   $SERVICEOUTPUT$
+
 ```"""
 
 
@@ -81,12 +89,16 @@ def construct_message_text(context):
     context["EVENT_TXT"] = utils.substitute_context(
         txt_info.replace("@", context["WHAT"]), context
     )
-
+    base_url = "NONE"
+    with open("../../../../tmp/base_url","r") as out:
+        base_url = out.read().rstrip("\n").rstrip("/")
     if context["WHAT"] == "HOST":
         tmpl_text = tmpl_host_text
+        context["LINK"] = f'{base_url}{context.get("HOSTURL")}'
     else:
         tmpl_text = tmpl_service_text
-
+        context["LINK"] = f'{base_url}{context.get("SERVICEURL")}'
+    
     return utils.substitute_context(tmpl_text, context)
 
 
@@ -119,6 +131,7 @@ def main():
     token = context["PARAMETER_BOT_TOKEN"]
     chat_id = context["PARAMETER_CHAT_ID"]
     text = construct_message_text(context)
+
     return send_telegram_message(token, chat_id, text)
 
 
