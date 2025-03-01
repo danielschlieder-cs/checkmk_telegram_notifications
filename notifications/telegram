@@ -17,9 +17,7 @@ from cmk.notification_plugins import utils
 
 
 tmpl_host_text = """$HOSTSTATE_EMOJI$ `$HOSTNAME$`
-Send by:  `$OMD_SITE$`
-[Link]($LINK$)
-[inline URL](http://www.example.com/)
+Send by:  `$OMD_SITE$` - [Direct Link]($LINK$)
 ```
 Host:     $HOSTNAME$
 Event:    $EVENT_TXT$
@@ -28,9 +26,7 @@ Output:   $HOSTOUTPUT$
 ```"""
 
 tmpl_service_text = """$SERVICESTATE_EMOJI$ `$HOSTNAME$/$SERVICEDESC$`
-Send by:  `$OMD_SITE$`
-[Link]($LINK$)
-[inline URL](http://www.example.com/)
+Send by:  `$OMD_SITE$` - [Direct Link]($LINK$)
 ```
 Host:     $HOSTNAME$
 Service:  $SERVICEDESC$
