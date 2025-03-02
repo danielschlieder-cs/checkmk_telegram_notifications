@@ -11,29 +11,35 @@
 
 from __future__ import unicode_literals
 from os import environ
+import re
 import sys
 import requests
 from cmk.notification_plugins import utils
 
 
-tmpl_host_text = """$HOSTSTATE_EMOJI$ `$HOSTNAME$`
-Send by:  `$OMD_SITE$` - [Direct Link]($LINK$)
-```
-Host:     $HOSTNAME$
-Event:    $EVENT_TXT$
-Output:   $HOSTOUTPUT$
+tmpl_host_text = """*$HOSTSTATE_EMOJI$**Monitor: $MON_HOST$* / Site: *$OMD_SITE$*
 
-```"""
+*Host* state change detected
 
-tmpl_service_text = """$SERVICESTATE_EMOJI$ `$HOSTNAME$/$SERVICEDESC$`
-Send by:  `$OMD_SITE$` - [Direct Link]($LINK$)
-```
-Host:     $HOSTNAME$
-Service:  $SERVICEDESC$
-Event:    $EVENT_TXT$
-Output:   $SERVICEOUTPUT$
+`Change         ` *$EVENT_TXT$*
+`Host:          ` [$HOSTNAME$]($HSTLINK$)
+`Service:       ` [$SERVICEDESC$]($SVCLINK$)
 
-```"""
+`$HOSTOUTPUT$`
+
+"""
+
+tmpl_service_text = """*$SERVICESTATE_EMOJI$* *Monitor: $MON_HOST$* / Site: *$OMD_SITE$*
+
+*Service* state change detected
+
+`Change         ` *$EVENT_TXT$*
+`Host:          ` [$HOSTNAME$]($HSTLINK$)
+`Service:       ` [$SERVICEDESC$]($SVCLINK$)
+
+`$SERVICEOUTPUT$`
+
+"""
 
 
 def hoststate_as_emoji(hoststate):
@@ -48,13 +54,13 @@ def hoststate_as_emoji(hoststate):
 
 def servicestate_as_emoji(servicestate):
     if servicestate == "OK":
-        return "\ud83c\udd97"  # squared ok
+        return "🟢"  # squared ok
     elif servicestate == "WARN":
-        return "\u26a0\ufe0f"  # warning sign
+        return "😡"  # warning sign
     elif servicestate == "CRIT":
-        return "\u2757\ufe0f"  # heavy exclamation mark symbol
+        return "🔴"  # heavy exclamation mark symbol
     elif servicestate == "UNKN":
-        return "\u2754"  # white question mark ornament
+        return "🤔"  # white question mark ornament
     return servicestate
 
 
@@ -86,14 +92,19 @@ def construct_message_text(context):
         txt_info.replace("@", context["WHAT"]), context
     )
     base_url = "NONE"
+    mon_host = "NONE"
     with open("../../../../tmp/base_url","r") as out:
         base_url = out.read().rstrip("\n").rstrip("/")
+        mon_host = str(base_url).replace("https://","").replace(f'/{environ.get("OMD_SITE")}',"")
+    context["MON_HOST"] = mon_host
+    context["HOSTNAME"] = re.sub(r"\..*","",context["HOSTNAME"] )
     if context["WHAT"] == "HOST":
         tmpl_text = tmpl_host_text
-        context["LINK"] = f'{base_url}{context.get("HOSTURL")}'
+        context["HSTLINK"] = f'{base_url}{context.get("HOSTURL")}'
     else:
         tmpl_text = tmpl_service_text
-        context["LINK"] = f'{base_url}{context.get("SERVICEURL")}'
+        context["HSTLINK"] = f'{base_url}{context.get("HOSTURL")}'.replace("hoststatus","host")
+        context["SVCLINK"] = f'{base_url}{context.get("SERVICEURL")}'
     
     return utils.substitute_context(tmpl_text, context)
 
