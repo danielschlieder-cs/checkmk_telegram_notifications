@@ -44,23 +44,23 @@ tmpl_service_text = """*$SERVICESTATE_EMOJI$* *Monitor: $MON_HOST$* / Site: *$OM
 
 def hoststate_as_emoji(hoststate):
     if hoststate == "UP":
-        return "\ud83d\udd35"  # large blue circle
+        return "🟩"  # large blue circle
     elif hoststate == "DOWN":
-        return "\ud83d\udd34"  # large red circle
+        return "🟥"  # large red circle
     elif hoststate == "UNREACH":
-        return "\u26aa\ufe0f"  # medium white circle
+        return "🟧"  # medium white circle
     return hoststate
 
 
 def servicestate_as_emoji(servicestate):
     if servicestate == "OK":
-        return "🟢"  # squared ok
+        return "🟩"  # squared ok
     elif servicestate == "WARN":
-        return "😡"  # warning sign
+        return "🟨"  # warning sign
     elif servicestate == "CRIT":
-        return "🔴"  # heavy exclamation mark symbol
+        return "🟥"  # heavy exclamation mark symbol
     elif servicestate == "UNKN":
-        return "🤔"  # white question mark ornament
+        return "🟧"  # white question mark ornament
     return servicestate
 
 
