@@ -93,7 +93,7 @@ def construct_message_text(context):
     )
     base_url = "NONE"
     mon_host = "NONE"
-    with open("../../../../tmp/base_url","r") as out:
+    with open(f"../../../../omd/sites/{environ.get('OMD_SITE')}/tmp/base_url","r") as out:
         base_url = out.read().rstrip("\n").rstrip("/")
         mon_host = str(base_url).replace("https://","").replace(f'/{environ.get("OMD_SITE")}',"")
     context["MON_HOST"] = mon_host
